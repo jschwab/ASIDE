@@ -1,43 +1,43 @@
-module kepler
+MODULE kepler
 
-  use types
-  use const
+  USE types
+  USE const
   
-  implicit none
+  IMPLICIT NONE
 
   ! this module provides tools to solve kepler's equation
   ! to a specified tolerance using a maximum # of iterations
 
   ! TODO: make these user-editable
-  real(rl), parameter :: tol = 1e-12
-  integer, parameter :: imax = 10
+  REAL(rl), PARAMETER :: tol = 1e-12
+  INTEGER, PARAMETER :: imax = 10
 
-  contains
+  CONTAINS
 
-  subroutine danby4(x, deltaM, ecE0, esE0)
+!=====================================================================
 
-  ! solve difference form of Kepler's equation using the algorithm in
-  ! Danby
-  ! which has local quartic convergence
+  SUBROUTINE danby4(x, deltaM, ecE0, esE0)
+
+  ! solve difference form of Kepler's equation using an algorithm
+  ! from Danby, J.A.M., "Fundamentals of Celestial Mechanics". 
 
   ! x - guess for deltaE -> final deltaE
   ! deltaM - delta mean anomaly (n * dt)
   ! ecE0 - e * cos(E0)
   ! esE0 - e * sin(E0)
 
+    REAL(rl), INTENT(INOUT) :: x
+    REAL(rl), INTENT(IN) :: deltaM, ecE0, esE0
 
-    real(rl), intent(inout) :: x
-    real(rl), intent(in) :: deltaM, ecE0, esE0
+    INTEGER :: i 
+    REAL(rl) :: sx, cx
+    REAL(rl) :: f, fp, fpp, fppp
+    REAL(rl) :: dx
 
-    integer :: i 
-    real(rl) :: sx, cx
-    real(rl) :: f, fp, fpp, fppp
-    real(rl) :: dx
+    DO i = 1, imax
 
-    do i = 1, imax
-
-       sx = sin(x)
-       cx = cos(x)
+       sx = SIN(x)
+       cx = COS(x)
 
        f = x - ecE0*sx + esE0*(1d0 - cx) - deltaM
        fp = 1d0 - ecE0*cx + esE0*sx
@@ -49,56 +49,62 @@ module kepler
        dx = -f /(fp + dx*(fpp/2d0 + dx*fppp/6d0))
        
        x = x + dx
-       if (abs(dx) <= tol) exit
+       IF (ABS(dx/x) <= tol) EXIT
 
-    end do
+    END DO
 
-    return
+    RETURN
 
-  end subroutine danby4
+  END SUBROUTINE danby4
 
+!=====================================================================
 
-  subroutine gaussfg(dt, obj, f, g, fdot, gdot)
+  SUBROUTINE gaussfg(dt, p, f, g, fdot, gdot)
 
-    use const
-    use types
+  ! evaluate gauss f & g functions
+ 
+  ! dt - timestep
+  ! p - particle
+  ! f,g - gauss f & g functions
+  ! fdot, gdot - time derivatives of gauss f & g functions
 
-    real(rl), intent(in) :: dt
-    type(particle), intent(in) :: obj
-    real(rl), intent(out) :: f, g, fdot, gdot
+    REAL(rl), INTENT(IN) :: dt
+    TYPE(particle), INTENT(IN) :: p
+    REAL(rl), INTENT(OUT) :: f, g, fdot, gdot
 
-    real(rl) :: r0, v02, u, a, n, r, e, sigma
-    real(rl) :: deltaE, deltaM, ecE0, esE0, cE, sE, y
+    REAL(rl) :: r0, v02, u, a, n, r, e, sigma
+    REAL(rl) :: deltaE, deltaM, ecE0, esE0, cE, sE, y
 
 
     ! calculate the orbital elements
-    r0 = sqrt(dot_product(obj % x, obj % x))
-    v02 = dot_product(obj % v, obj % v)
-    u = dot_product(obj % x, obj % v)
-    a = 1d0 / (2d0/r0 - v02/obj % mu)
-    n = sqrt(obj % mu / a**3)
+    r0 = SQRT(DOT_PRODUCT(p % x, p % x))
+    v02 = DOT_PRODUCT(p % v, p % v)
+    u = DOT_PRODUCT(p % x, p % v)
+    a = 1d0 / (2d0/r0 - v02/p % mu)
+    n = SQRT(p % mu / a**3)
 
     deltaM = n * dt
     ecE0 = 1d0 - r0/a
     esE0 = u/(n*a*a)
 
-    e = sqrt(ecE0*ecE0 + esE0*esE0)
+    e = SQRT(ecE0*ecE0 + esE0*esE0)
 
-    ! danby suggestes the following guess for delta E
-    if (e .lt. 0.1) then
+    ! danby suggests the following guess for delta E
+    IF (e .lt. 0.1) THEN
        deltaE = deltaM
-    else ! high eccentricity
-       y = mod(deltaM,twopi) - esE0
-       sigma = sign(0.85d0, esE0*cos(y) + ecE0*sin(y))
+    ELSE ! high eccentricity
+       y = MOD(deltaM,twopi) - esE0
+       sigma = SIGN(0.85d0, esE0*COS(y) + ecE0*SIN(y))
        deltaE = y + sigma * e
-    end if
+    END IF
 
     ! calculate delta E
-    call danby4(deltaE, deltaM, ecE0, esE0)
+    CALL danby4(deltaE, deltaM, ecE0, esE0)
   
-    cE = cos(deltaE)
-    sE = sin(deltaE)
+    cE = COS(deltaE)
+    sE = SIN(deltaE)
     
+    ! TODO: make the computation of f & g more efficient
     ! r 
     r = a * (1d0 - ecE0 * cE + esE0 * sE)
 
@@ -110,9 +116,10 @@ module kepler
     fdot = -(a/r)*(a/r0)* n * sE
     gdot = (a/r)*(cE - 1d0) + 1
     
-    return
+    RETURN
     
-  end subroutine gaussfg
+  END SUBROUTINE gaussfg
 
+!=====================================================================
 
-end module kepler
+END MODULE kepler

@@ -2,6 +2,8 @@ MODULE drift
        
   USE types
 
+  IMPLICIT NONE
+
   CONTAINS
 
   SUBROUTINE drift_kep(dt, p)
