@@ -24,8 +24,8 @@ MODULE particles
     j1 % x = m1 % x
     j1 % v = m1 % v
 
-    j2 % x = m2 % x - 1d0/s1 * (m1 % m * m1 % x)
-    j2 % v = m2 % v - 1d0/s1 * (m1 % m * m1 % v)
+    j2 % x = m2 % x - (m1 % m * m1 % x) / s1 
+    j2 % v = m2 % v - (m1 % m * m1 % v) / s1 
     
     j1 % mu = s1 / s0
     j2 % mu = s2 / s1
