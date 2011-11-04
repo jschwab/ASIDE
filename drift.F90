@@ -6,27 +6,46 @@ MODULE drift
 
   CONTAINS
 
+!=======================================================================
+
   SUBROUTINE drift_kep(dt, p)
+
+    ! dt - integrator timestep
+    ! p  - particles to drift
+
+    REAL(rl), INTENT(IN) :: dt
+    TYPE(allparticles), INTENT(INOUT) :: p
+
+    CALL drift_one(dt,p%j1)
+    CALL drift_one(dt,p%j2)
+
+  END SUBROUTINE drift_kep
+
+!=======================================================================
+
+  SUBROUTINE drift_one(dt, pn)
 
     USE kepler
 
     ! dt - integrator timestep
-    ! p  - particle to drift
+    ! p  - particles to drift
 
     REAL(rl), INTENT(IN) :: dt
-    TYPE(particle), INTENT(INOUT) :: p
+    TYPE(particle), INTENT(INOUT) :: pn
     
     REAL(rl), DIMENSION(3) :: x, v
     REAL(rl) :: f, g, fdot, gdot
 
-    CALL gaussfg(dt, p, f, g, fdot, gdot)
+    CALL gaussfg(dt, pn, f, g, fdot, gdot)
 
-    x = (p % x) * f    + (p % v) * g
-    v = (p % x) * fdot + (p % v) * gdot
+    x = (pn % x) * f    + (pn % v) * g
+    v = (pn % x) * fdot + (pn % v) * gdot
 
-    p % x = x
-    p % v = v
+    pn % x = x
+    pn % v = v
 
-  END SUBROUTINE drift_kep
+  END SUBROUTINE drift_one
+
+!=======================================================================
 
 END MODULE drift

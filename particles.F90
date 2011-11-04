@@ -34,22 +34,21 @@ MODULE particles
 
 !=======================================================================
 
-  SUBROUTINE tohelio(m1,m2,j1,j2)
+  SUBROUTINE tohelio(p)
  
-    TYPE(particle), intent(inout) :: m1, m2
-    TYPE(particle), intent(in) :: j1, j2
+    TYPE(allparticles), INTENT(INOUT) :: p
 
     REAL(rl) :: s0,s1,s2
 
     s0 = 1d0
-    s1 = m1 % m + s0
-    s2 = m2 % m + s1
+    s1 = p % m1 % m + s0
+    s2 = p % m2 % m + s1
 
-    m1 % x = j1 % x
-    m1 % v = j1 % v
+    p % m1 % x = p % j1 % x
+    p % m1 % v = p % j1 % v
 
-    m2 % x = j2 % x + m1 % m / s1 * j1 % x
-    m2 % v = j2 % v + m1 % m / s1 * j1 % v
+    p % m2 % x = p % j2 % x + p % m1 % m / s1 * p % j1 % x
+    p % m2 % v = p % j2 % v + p % m1 % m / s1 * p % j1 % v
     
   END SUBROUTINE tohelio
 

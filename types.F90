@@ -12,4 +12,9 @@ MODULE types
      REAL(rl), DIMENSION(3) :: a ! kick
   END TYPE particle
 
+  TYPE allparticles
+     TYPE(particle) :: m1, j1 ! perturbing mass
+     TYPE(particle) :: m2, j2 ! test mass
+  END TYPE allparticles
+
 END MODULE types
