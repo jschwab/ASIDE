@@ -15,7 +15,7 @@ MODULE kick
       real(rl) :: dt
       type(particle) :: m1,m2,j1,j2
 
-      CALL a(m1,m2,j1,j2)
+      CALL accel(m1,m2,j1,j2)
 
       j1 % v = (j1 % v) + j1%a * dt
       j2 % v = (j2 % v) + j2%a * dt
