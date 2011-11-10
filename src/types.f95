@@ -2,8 +2,7 @@ MODULE types
 
   IMPLICIT NONE
 
-  REAL*8 :: real8
-  INTEGER, PARAMETER :: rl = KIND(real8)
+  INTEGER, PARAMETER :: rl = 8
 
   TYPE particle
      REAL(rl) :: m  ! particle mass
