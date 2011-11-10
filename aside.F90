@@ -5,6 +5,7 @@ PROGRAM aside
   USE utils
   USE particles
   USE step
+  USE corrector
   USE output
 
 
@@ -33,7 +34,7 @@ PROGRAM aside
   m2 % m  = 0d0
   m2 % mu = 1d0
   
-  a = 0.1d0; e = 0.0d0; i = 15d0 * d2r
+  a = 0.1d0; e = 0.0d0; i = 30d0 * d2r
   o = 0d0; w = 0d0; f = 0.0d0
 
   CALL oe_to_xv(m2,a,e,i,o,w,f)
@@ -49,11 +50,15 @@ PROGRAM aside
 
   open(unit=outfile, file = "aside.out", action = "write")
 
-  dt = 1d-3
-  do j = 1, 1000
+  CALL write_state(outfile, 0d0, p)
 
-     CALL bigstep(1000,dt,p)
-     CALL write_state(outfile, dt*j, p)
+  dt = 1d-2
+  do j = 1, 10000
+
+     CALL C(dt,p)
+     CALL bigstep(100,dt,p)
+     CALL Ci(dt,p)
+     CALL write_state(outfile, dt*j*100, p)
      
   end do
 
