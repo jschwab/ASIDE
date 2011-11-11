@@ -23,8 +23,9 @@ MODULE OUTPUT
 
       CALL xv_to_oe(p%m2, a,e,i,o,w,f)
       CJ = Cjacobi(p)
-      WRITE(outfile,"(11ES16.6)") t, a, e, i, o, w, f, p%m2%x, CJ
 
+      WRITE(outfile,"(7ES20.10)") t, a, e, i, o, w, CJ
+      
     END SUBROUTINE write_state
 
 !=======================================================================
