@@ -8,27 +8,33 @@ MODULE particles
 
   CONTAINS
 
-  SUBROUTINE tojacobi(m1,m2,j1,j2)
+  SUBROUTINE tojacobi(p)
  
-    TYPE(particle), intent(in) :: m1, m2
-    TYPE(particle), intent(inout) :: j1, j2
-    REAL(rl) :: s0, s1, s2
+    TYPE(allparticles), intent(inout) :: p
 
-    s0 = 1d0
-    s1 = m1 % m + s0
-    s2 = m2 % m + s1
+  ! this is called eta in M&D
+    p%j0%sigma = 1.0d0
+    p%j1%sigma = 1.0d0 + p%m1%m
+    p%j2%sigma = 1.0d0 + p%m1%m + p%m2%m
 
-    j1 % m = s0 / s1 * m1 % m
-    j2 % m = s1 / s2 * m2 % m
+  ! blah blah
+    p%j0%m = 1d0 + p%m1%m + p%m2%m
+    p%j1%m = p%m1%m / (1d0 + p%m1%m)
+    p%j2%m = (1d0 + p%m1%m) * p%m2%m / (1d0 + p%m1%m + p%m2%m)
 
-    j1 % x = m1 % x
-    j1 % v = m1 % v
+    p%j0%mu = 0d0
+    p%j1%mu = 1d0 + p%m1%m
+    p%j2%mu = (1d0 + p%m1%m + p%m2%m) / (1d0 + p%m1%m)
 
-    j2 % x = m2 % x - (m1 % m * m1 % x) / s1 
-    j2 % v = m2 % v - (m1 % m * m1 % v) / s1 
-    
-    j1 % mu = s1 / s0
-    j2 % mu = s2 / s1
+    p%j0%x = (p%m0%x + p%m1%m * p%m1%x + p%m2%m*p%m2%x)/(1d0+p%m1%m+p%m2%m)
+    p%j0%v = (p%m0%v + p%m1%m * p%m1%v + p%m2%m*p%m2%v)/(1d0+p%m1%m+p%m2%m)
+          
+    p%j1%x = (p%m1%x-p%m0%x) 
+    p%j1%v = (p%m1%v-p%m0%v) 
+          
+    p%j2%x = p%m2%x - (p%m0%x + p%m1%m * p%m1%x)/(1d0+p%m1%m)
+    p%j2%v = p%m2%v - (p%m0%v + p%m1%m * p%m1%v)/(1d0+p%m1%m)
+
 
   END SUBROUTINE tojacobi
 
@@ -38,18 +44,15 @@ MODULE particles
  
     TYPE(allparticles), INTENT(INOUT) :: p
 
-    REAL(rl) :: s0,s1,s2
+    p%m0%x = p%j0%x - p%m1%m * p%j1%x/(1d0+p%m1%m)-p%m2%m*p%j2%x/(1d0+p%m1%m+p%m2%m)
+    p%m0%v = p%j0%v - p%m1%m * p%j1%v/(1d0+p%m1%m)-p%m2%m*p%j2%v/(1d0+p%m1%m+p%m2%m)
 
-    s0 = 1d0
-    s1 = p % m1 % m + s0
-    s2 = p % m2 % m + s1
+    p%m1%x = p%j0%x + p%j1%x/(1d0+p%m1%m)-p%m2%m*p%j2%x/(1d0+p%m1%m+p%m2%m)
+    p%m1%v = p%j0%v + p%j1%v/(1d0+p%m1%m)-p%m2%m*p%j2%v/(1d0+p%m1%m+p%m2%m)
 
-    p % m1 % x = p % j1 % x
-    p % m1 % v = p % j1 % v
+    p%m2%x = p%j0%x + (1d0 + p%m1%m) / (1d0 + p%m1%m + p%m2%m) * p%j2%x
+    p%m2%v = p%j0%v + (1d0 + p%m1%m) / (1d0 + p%m1%m + p%m2%m) * p%j2%v
 
-    p % m2 % x = p % j2 % x + p % m1 % m / s1 * p % j1 % x
-    p % m2 % v = p % j2 % v + p % m1 % m / s1 * p % j1 % v
-    
   END SUBROUTINE tohelio
 
 !=======================================================================
@@ -62,7 +65,7 @@ MODULE particles
   ! a,e,i,o,w,f - orbital elements
   ! p - particle whose x,v will be set
  
-    TYPE(particle), INTENT(IN) :: p
+    TYPE(mparticle), INTENT(IN) :: p
     REAL(rl),INTENT(OUT):: a,e,i,o,w,f
 
     REAL(rl) :: R2,R,V2,H2,H,Rdot,wmf
@@ -77,8 +80,9 @@ MODULE particles
 
     Rdot = DOT_PRODUCT(p%x,p%v) / R
 
-    a = 1d0 / (2d0/R - V2 / p%mu)
-    e = SQRT(ABS(1d0 - H2/p%mu/a)) ! this is a cheap trick
+    a = 1d0 / (2d0/R - V2)
+    e = SQRT(MAX(1d0 - H2/a, 0d0))
+       
     i = ACOS(Hv(3)/H)
 
     o = ATAN2(-Hv(1),Hv(2))
@@ -101,7 +105,7 @@ MODULE particles
   ! a,e,i,o,w,f - orbital elements
   ! p - particle whose x,v will be set
 
-    TYPE(particle), INTENT(INOUT) :: p 
+    TYPE(mparticle), INTENT(INOUT) :: p 
     REAL(rl), INTENT(IN) :: a,e,i,o,w,f
 
     REAL(rl), DIMENSION(3) :: x,v
@@ -116,7 +120,7 @@ MODULE particles
     cwf = COS(w+f)
     swf = SIN(w+f)
 
-    naome2 = SQRT(p % mu / a / (1d0 - e*e))
+    naome2 = SQRT(1d0 / a / (1d0 - e*e))
 
     x(1) = co * cwf - so * swf * ci
     x(2) = so * cwf + co * swf * ci

@@ -69,7 +69,7 @@ MODULE kepler
   ! fdot, gdot - time derivatives of gauss f & g functions
 
     REAL(rl), INTENT(IN) :: dt
-    TYPE(particle), INTENT(IN) :: p
+    TYPE(jparticle), INTENT(IN) :: p
     REAL(rl), INTENT(OUT) :: f, g, fdot, gdot
 
     REAL(rl) :: r0, v02, u, a, n, r, e, sigma

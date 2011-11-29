@@ -16,6 +16,7 @@ MODULE drift
     REAL(rl), INTENT(IN) :: dt
     TYPE(allparticles), INTENT(INOUT) :: p
 
+    p % j0 % x = p % j0 % x + p % j0 % v * dt
     CALL drift_one(dt,p%j1)
     CALL drift_one(dt,p%j2)
 
@@ -31,7 +32,7 @@ MODULE drift
     ! p  - particles to drift
 
     REAL(rl), INTENT(IN) :: dt
-    TYPE(particle), INTENT(INOUT) :: pn
+    TYPE(jparticle), INTENT(INOUT) :: pn
     
     REAL(rl), DIMENSION(3) :: x, v
     REAL(rl) :: f, g, fdot, gdot
