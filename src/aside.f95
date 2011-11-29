@@ -3,7 +3,6 @@ PROGRAM aside
   USE const
   USE types
   USE utils
-  USE particles
   USE step
   USE corrector
   USE input
@@ -22,7 +21,7 @@ PROGRAM aside
   INTEGER, PARAMETER ::  infile = 7
   INTEGER, PARAMETER :: outfile = 8
 
-  
+
   OPEN(unit=infile, file = "aside.in", action = "read")
   CALL read_input(infile, p, dt, tmax, tdump)
   CLOSE(infile)
@@ -32,11 +31,11 @@ PROGRAM aside
   CALL write_state(outfile, 0d0, p)
 
   ndump = int(tdump / dt)
-  nmax  = int(ndump / dt)
+  nmax  = int(tmax / dt)
 
   t = 0
 
-  do n = 1, nmax
+  do n = 1, nmax, ndump
 
 !     CALL C(dt,p)
      CALL bigstep(ndump,dt,p)

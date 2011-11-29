@@ -1,7 +1,7 @@
 MODULE step
 
   USE types
-  USE particles
+  USE coord
   USE drift
   USE kick
 

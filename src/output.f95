@@ -1,7 +1,7 @@
 MODULE OUTPUT
 
   USE types
-  USE particles
+  USE orbel
 
   IMPLICIT NONE
 
@@ -19,12 +19,17 @@ MODULE OUTPUT
       REAL(rl), INTENT(IN) :: t
       TYPE(allparticles), INTENT(IN) :: p
 
-      REAL(rl) :: a,e,i,o,w,f,CJ
+      REAL(rl), DIMENSION(3) :: x, v
+      REAL(rl), DIMENSION(6) :: oe
 
-      CALL xv_to_oe(p%m2, a,e,i,o,w,f)
-      CJ = Cjacobi(p)
+      x = p%m2%x - p%m0%x
+      v = p%m2%v - p%m0%v
 
-      WRITE(outfile,"(7ES20.10)") t, a, e, i, o, w, CJ
+      CALL xv_to_oe(x,v,oe)
+!      CJ = Cjacobi(p)
+
+      WRITE(outfile,"(7ES20.10)") t, p%m2%x-p%m0%x,p%m2%v-p%m0%v
+!      WRITE(outfile,"(7ES20.10)") t, oe
       
     END SUBROUTINE write_state
 
