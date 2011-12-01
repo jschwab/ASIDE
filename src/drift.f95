@@ -16,7 +16,10 @@ MODULE drift
     REAL(rl), INTENT(IN) :: dt
     TYPE(allparticles), INTENT(INOUT) :: p
 
+    ! center of mass moves freely
     p % j0 % x = p % j0 % x + p % j0 % v * dt
+
+    ! keplarian drifts
     CALL drift_one(dt,p%j1)
     CALL drift_one(dt,p%j2)
 

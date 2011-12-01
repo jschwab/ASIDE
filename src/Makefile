@@ -1,5 +1,5 @@
 FC=gfortran
-FLAGS= -g -O0 -ffpe-trap=invalid,zero,overflow -std=f95 -fimplicit-none
+FLAGS= -g -O0 -ffpe-trap=invalid,zero,overflow 
 
 FOBJ = types.o const.o utils.o coord.o orbel.o input.o output.o kepler.o drift.o  wh91.o kick.o step.o corrector.o aside.o
 

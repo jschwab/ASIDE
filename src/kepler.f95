@@ -94,7 +94,7 @@ MODULE kepler
        deltaE = deltaM
     ELSE ! high eccentricity
        y = MOD(deltaM,twopi) - esE0
-       sigma = SIGN(0.85d0, esE0*COS(y) + ecE0*SIN(y))
+       sigma = SIGN(0.85_rl, esE0*COS(y) + ecE0*SIN(y))
        deltaE = y + sigma * e
     END IF
 

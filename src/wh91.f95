@@ -14,7 +14,7 @@ MODULE wh91
       REAL(rl), DIMENSION(3) :: dir2, indir2
 
       REAL(rl), DIMENSION(3) :: r12, r01, r02
-      REAL(rl) :: r12m3
+      REAL(rl) :: r12m3, r01m3
 
     ! calculate interparticle vectors r_ij -> r_j - r_i
 
@@ -25,31 +25,34 @@ MODULE wh91
     ! pre-calculate magnitude(s) cubed
 
       r12m3 = DOT_PRODUCT(r12,r12)**(-1.5d0)
+      r01m3 = DOT_PRODUCT(r01,r01)**(-1.5d0)
 
     ! calculate direct terms
 
       dir1 =   p%m2%m * r12 * r12m3
       dir2 = - p%m1%m * r12 * r12m3 & 
-             - p%m1%m/p%j1%sigma * dir1 
+             - p%m1%m/p%j1%sigma * dir1
 
     ! calculate indirect kicks
 
-      indir1 = p%j1%mu * ( &
+      indir1 = - p%j1%mu * ( &
                   ((p%j1%x - r01) - f(p%j1%x,r01) * r01) &
                   / DOT_PRODUCT(p%j1 % x,p%j1 % x)**1.5d0 &
                  + p%m2%m/p%j1%sigma * r02 / DOT_PRODUCT(r02,r02)**1.5d0)
 
-      indir2 = p%j2%mu * ( & 
-                 ((p%j2%x - r02) - f(p%j2%x,r02) * r02) & 
-                 / DOT_PRODUCT(p%j2 % x,p%j2 % x)**1.5d0 )
+      indir2 = - p%j2%mu * ( & 
+!                 ((p%j2%x - r02) - f(p%j2%x,r02) * r02) & 
+                 p%j2%x/ DOT_PRODUCT(p%j2 % x,p%j2 % x)**1.5d0 - & 
+                 r02 / DOT_PRODUCT(r02     , r02    )**1.5d0)
+
 
     ! set kicks
 
       p%j0%a = 0
       p%j1%a = dir1 + indir1 
-      p%j2%a = dir2 + indir2
+      p%j2%a = 0 !dir2 + indir2
 
-    end subroutine accel
+    END SUBROUTINE accel
 
   ! this function lets us rewrite the indirect terms such that
   ! we are unlikely subtract two approximately equal quantities

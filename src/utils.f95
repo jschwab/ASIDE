@@ -29,7 +29,7 @@ MODULE utils
     ! calculate the jacobi constant
     R0 = SQRT(DOT_PRODUCT(p%m2%x,p%m2%x))
     R1 = SQRT(DOT_PRODUCT(p%m1%x-p%m2%x,p%m1%x-p%m2%x))
-    V2 = DOT_PRODUCT(p%j2%v,p%j2%v)
+    V2 = DOT_PRODUCT(p%m2%v,p%m2%v)
     
     n = SQRT(p%j1 % mu)
 

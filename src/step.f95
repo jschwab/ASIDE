@@ -21,23 +21,56 @@ MODULE step
       
       INTEGER :: i
 
-      ! first part of step: D^{1/2}
-      CALL drift_kep(0.5d0*dt, p)
+      ! ! first part of step: D^{1/2}
+      ! CALL drift_kep(0.5d0*dt, p)
+      ! CALL tohelio(p)       
+
+      ! DO i = 1, n - 1
+         
+      !    ! middle part of step (KD)^{n-1}
+
+      !    CALL kick_all(dt, p)
+      !    CALL drift_kep(dt,p)
+      !    CALL tohelio(p)
+
+      ! ENDDO
+
+      ! ! final part of step KD^{1/2}
+      ! CALL kick_all(dt, p)
+      ! CALL drift_kep(0.5d0*dt, p)
+      ! CALL tohelio(p)
+
+      ! first part of step: K^{1/2}
+
       CALL tohelio(p)       
+
+      WRITE(*,*) "BEGN:", p%m1%x-p%m0%x,p%m1%v - p%m0%v
+
+      CALL kick_all(0.5_rl * dt, p)
+      CALL tohelio(p)
+
+      WRITE(*,*) "K1/2:", p%m1%x-p%m0%x,p%m1%v-p%m0%v
 
       DO i = 1, n - 1
          
-         ! middle part of step (KD)^{n-1}
+         ! middle part of step (DK)^{n-1}
 
-         CALL kick_all(dt, p)
          CALL drift_kep(dt,p)
+         CALL tohelio(p)
+         CALL kick_all(dt, p)
          CALL tohelio(p)
 
       ENDDO
 
       ! final part of step KD^{1/2}
-      CALL kick_all(dt, p)
-      CALL drift_kep(0.5d0*dt, p)
+      CALL drift_kep(dt, p)
+      CALL tohelio(p)
+
+      WRITE(*,*) "D1/1:", p%m1%x-p%m0%x,p%m1%v-p%m0%v
+
+      CALL kick_all(0.5_rl * dt, p)
+
+      WRITE(*,*) "K1/2:", p%m1%x-p%m0%x,p%m1%v-p%m0%v
       CALL tohelio(p)
 
     END SUBROUTINE bigstep

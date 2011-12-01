@@ -6,13 +6,15 @@ MODULE orbel
  
   IMPLICIT NONE
 
+  REAL(rl), PARAMETER :: TINY = 1e-12_rl
+
   ! the orbital elements are manipulated in a 6-element array
   ! (a,e,i,o,w,f)
   ! a - semimajor axis
   ! e - eccentricity
   ! i - inclination
-  ! o - 
-  ! w - 
+  ! o - longitude of ascending node
+  ! w - argument of pericenter
   ! f - true anomaly
 
   CONTAINS
@@ -28,8 +30,10 @@ MODULE orbel
     REAL(rl), DIMENSION(6), INTENT(OUT) :: oe
 
     REAL(rl) :: a,e,i,o,w,f
-    REAL(rl) :: R2,R,V2,H2,H,Rdot,wmf
+    REAL(rl) :: R2,R,V2,H2,H,Rdot,wpf
     REAL(rl), DIMENSION(3) :: Hv
+
+    REAL(rl) :: fac
 
     R2 = DOT_PRODUCT(x,x)
     R  = SQRT(R2)
@@ -40,18 +44,40 @@ MODULE orbel
 
     Rdot = DOT_PRODUCT(x,v) / R
 
+    ! semi-major axis
     a = 1d0 / (2d0/R - V2)
-    e = SQRT(MAX(1d0 - H2/a, 0d0))
-       
+
+    ! eccentricity
+    fac = 1d0 - H2/a
+    IF (fac > TINY) THEN
+       e = SQRT(fac)
+    ELSE
+       e = 0d0   
+    ENDIF
+
+    ! inclination
     i = ACOS(Hv(3)/H)
 
-    o = ATAN2(-Hv(1),Hv(2))
+    ! longitude of ascending node
+    fac = SQRT(Hv(1)*Hv(1)+Hv(2)*Hv(2))/H
+    IF (fac > TINY) THEN
+       o = ATAN2(-Hv(1),Hv(2))
+    ELSE
+       o = 0d0
+    end IF
 
-    wmf = ATAN2(x(3)*COS(o), x(1)*SIN(i)+x(3)*SIN(o)*COS(i))
+    ! argument of pericenter & true anomaly
     
-    f = ATAN2(R*Rdot/H, 1d0 - R/a/(1d0-e*e))
-    
-    w = wmf + f
+    f = ATAN2(a * (1_rl - e*e) * Rdot / H, &
+              a * (1_rl - e*e)/R - 1_rl)
+
+    wpf = ATAN2(x(3)*COS(o), x(1)*SIN(i)+x(3)*SIN(o)*COS(i))    
+
+    IF (o == 0d0) then 
+       w = 0
+    ELSE
+       w = wpf - f
+    END IF
 
     oe(1) = a
     oe(2) = e
