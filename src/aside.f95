@@ -4,7 +4,6 @@ PROGRAM aside
   USE types
   USE utils
   USE step
-  USE corrector
   USE input
   USE output
 
@@ -35,9 +34,7 @@ PROGRAM aside
 
   DO n = 1, nmax, ndump
 
-!     CALL C(dt,p) ! symplectic corrector
      CALL bigstep(ndump,dt,p)
-!     CALL Ci(dt,p)) ! symplectic corrector
 
      t = t + dt*dble(ndump)
 
