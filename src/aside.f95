@@ -10,6 +10,7 @@ PROGRAM aside
   IMPLICIT NONE
 
   TYPE(allparticles) :: p
+  LOGICAL :: badstep
 
   INTEGER ::  n
   REAL(rl) :: t, dt, tmax, tdump
@@ -19,29 +20,40 @@ PROGRAM aside
   INTEGER, PARAMETER ::  infile = 7
   INTEGER, PARAMETER :: outfile = 8
 
+  ! read the initial conditions
   OPEN(unit=infile, file = "aside.in", action = "read")
   CALL read_input(infile, p, dt, tmax, tdump)
   CLOSE(infile)
 
+  ! open the output file and dump the intial state
   OPEN(unit=outfile, file = "aside.out", action = "write")
-
   CALL write_state(outfile, 0.0_rl, p)
 
-  ndump = iNT(tdump / dt)
+  ! convert the time intervals into step intervals
+  ndump = INT(tdump / dt)
   nmax  = INT(tmax / dt)
 
+  ! we start at t = 0 and then off we go
   t = 0
-
   DO n = 1, nmax, ndump
 
+     ! we advance  ndump steps at once
+     ! this is only approximately tdump
+     t = t + dt*dble(ndump)
      CALL bigstep(ndump,dt,p)
 
-     t = t + dt*dble(ndump)
-
+     ! we want output, so here it is
      CALL write_state(outfile, t, p)
+
+     ! if something bad happened, it's time to stop
+     if (badstep) then 
+        write(6,*) "Terminating..."
+        exit
+     end if
      
   END DO
 
+  ! and we're all finished now
   CLOSE(outfile)
   
 END PROGRAM aside
