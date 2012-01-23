@@ -63,8 +63,8 @@ MODULE INPUT
       ! convert to jacobi coordinatse
       CALL tojacobi(p)
 
-      write(*,*) mp%x, mp%v
-      write(*,*) mt%x, mt%v
+      ! write(*,*) mp%x, mp%v
+      ! write(*,*) mt%x, mt%v
 
     END SUBROUTINE read_input
 
