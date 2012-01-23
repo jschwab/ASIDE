@@ -170,8 +170,8 @@ class MyPlots
   end
 
   def jacobiconstant
-    ys = 0.5 / @a + (@a * (1-@e*@e)).sqrt()
-    make_panel(ys, "Jacobi Constant")
+    ys = 0.5 / @a + (@a * (1-@e*@e)).sqrt() * @i.cos()
+    make_panel(@f, "Jacobi Constant")
   end
 
 
