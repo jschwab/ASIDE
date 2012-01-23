@@ -34,7 +34,7 @@ MODULE orbel
     REAL(rl) :: R2,R,V2,H2,H,Rdot,wpf
     REAL(rl), DIMENSION(3) :: Hv
 
-    REAL(rl) :: fac
+    REAL(rl) :: fac, cape, sw, cw
 
     R2 = DOT_PRODUCT(x,x)
     R  = SQRT(R2)
@@ -70,23 +70,20 @@ MODULE orbel
     ! put o in [0, 2 pi)
     IF (o .LT. 0.0_rl) o = o + twopi
 
-    ! argument of pericenter & true anomaly
-    
-    f = ATAN2(a * (1_rl - e*e) * Rdot / H, &
-              a * (1_rl - e*e)/R - 1_rl)
-
-!    IF (f .LT. 0) f = f + twopi
-
+    ! argument of pericenter
     wpf = ATAN2(x(3)*COS(o), x(1)*SIN(i)+x(3)*SIN(o)*COS(i))    
+
+    ! true anomaly
+    f = ATAN2(a * (1.0_rl - e*e) * Rdot / H, &
+              a * (1.0_rl - e*e)/R - 1.0_rl)
 
     IF (o == 0d0) then 
        w = 0
     ELSE
        w = wpf - f
     END IF
-    
-    IF (w .LT. 0) w = w + twopi
 
+    IF (w .LT. 0) w = w + twopi
 
     oe(1) = a
     oe(2) = e
