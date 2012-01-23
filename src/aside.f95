@@ -39,17 +39,18 @@ PROGRAM aside
 
      ! we advance  ndump steps at once
      ! this is only approximately tdump
-     t = t + dt*dble(ndump)
-     CALL bigstep(ndump,dt,p)
+     t = t + dt*REAL(ndump,rl)
+     CALL bigstep(ndump,dt,p, badstep)
+     WRITE(6,"(A, ES8.2, A, I3,A)") "t = ", t, " (", INT(t/tmax * 1e2_rl),"%)"
+
+     ! if something bad happened, it's time to stop
+     IF (badstep) THEN 
+        WRITE(6,*) "Terminating..."
+        EXIT
+     ENDIF
 
      ! we want output, so here it is
      CALL write_state(outfile, t, p)
-
-     ! if something bad happened, it's time to stop
-     if (badstep) then 
-        write(6,*) "Terminating..."
-        exit
-     end if
      
   END DO
 
