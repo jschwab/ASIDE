@@ -43,7 +43,7 @@ MODULE INPUT
       oe(1) = a;       oe(2) = e;       oe(3) = i * d2r
       oe(4) = o * d2r; oe(5) = w * d2r; oe(6) = f * d2r
 
-      CALL oe_to_xv(mp%x,mp%v,oe)
+      CALL oe_to_xv(mc%m+mp%m, mp%x,mp%v,oe)
 
       ! get the information about the test mass
       READ(infile,nml=testmass)
@@ -53,13 +53,7 @@ MODULE INPUT
       oe(1) = a;       oe(2) = e;       oe(3) = i * d2r
       oe(4) = o * d2r; oe(5) = w * d2r; oe(6) = f * d2r
 
-      CALL oe_to_xv(mt%x, mt%v, oe)
-
-      mt % x = (/0.1_rl, 0.0_rl, 0.0_rl/)
-      mt % v = (/0.0_rl, 3.0_rl, 0.0_rl/)
-
-      mp % x = (/-1.0_rl, 0.0_rl, 0.0_rl/)
-      mp % v = (/ 0.0_rl,-1.0_rl, 0.0_rl/)
+      CALL oe_to_xv(mc%m, mt%x, mt%v, oe)
 
       ! this chooses the ordering in jacobi coordinates
       p % m0 = mc
@@ -68,6 +62,9 @@ MODULE INPUT
 
       ! convert to jacobi coordinatse
       CALL tojacobi(p)
+
+      write(*,*) mp%x, mp%v
+      write(*,*) mt%x, mt%v
 
     END SUBROUTINE read_input
 

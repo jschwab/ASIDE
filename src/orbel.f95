@@ -21,11 +21,12 @@ MODULE orbel
 
 !=======================================================================
 
-  SUBROUTINE xv_to_oe(x,v,oe)
+  SUBROUTINE xv_to_oe(mu,x,v,oe)
 
   ! convert x,v to the standard orbital elements
   ! this uses the algorithm on page 53 of Murray & Dermott
  
+    REAL(rl), INTENT(IN) :: mu
     REAL(rl), DIMENSION(3), INTENT(IN) :: x, v
     REAL(rl), DIMENSION(6), INTENT(OUT) :: oe
 
@@ -45,14 +46,14 @@ MODULE orbel
     Rdot = DOT_PRODUCT(x,v) / R
 
     ! semi-major axis
-    a = 1d0 / (2d0/R - V2)
+    a = 1.0_rl / (2.0_rl / R - V2/mu)
 
     ! eccentricity
-    fac = 1d0 - H2/a
+    fac = 1d0 - H2/a/mu
     IF (fac > TINY) THEN
        e = SQRT(fac)
     ELSE
-       e = 0d0   
+       e = 0.0_rl
     ENDIF
 
     ! inclination
@@ -61,15 +62,20 @@ MODULE orbel
     ! longitude of ascending node
     fac = SQRT(Hv(1)*Hv(1)+Hv(2)*Hv(2))/H
     IF (fac > TINY) THEN
-       o = ATAN2(-Hv(1),Hv(2))
+       o = ATAN2(Hv(1),-Hv(2))
     ELSE
        o = 0d0
-    end IF
+    ENDIF
+
+    ! put o in [0, 2 pi)
+    IF (o .LT. 0.0_rl) o = o + twopi
 
     ! argument of pericenter & true anomaly
     
     f = ATAN2(a * (1_rl - e*e) * Rdot / H, &
               a * (1_rl - e*e)/R - 1_rl)
+
+!    IF (f .LT. 0) f = f + twopi
 
     wpf = ATAN2(x(3)*COS(o), x(1)*SIN(i)+x(3)*SIN(o)*COS(i))    
 
@@ -78,6 +84,9 @@ MODULE orbel
     ELSE
        w = wpf - f
     END IF
+    
+    IF (w .LT. 0) w = w + twopi
+
 
     oe(1) = a
     oe(2) = e
@@ -91,11 +100,12 @@ MODULE orbel
 
 !=======================================================================
   
-  SUBROUTINE oe_to_xv(x,v,oe)
+  SUBROUTINE oe_to_xv(mu,x,v,oe)
 
   ! convert the standard orbital elements to x,v
   ! this uses various expressions from  Murray & Dermott
   
+    REAL(rl), INTENT(IN) :: mu
     REAL(rl), DIMENSION(3), INTENT(OUT) :: x, v
     REAL(rl), DIMENSION(6), INTENT(IN) :: oe
 
@@ -117,7 +127,7 @@ MODULE orbel
     cwf = COS(w+f)
     swf = SIN(w+f)
 
-    naome2 = SQRT(1d0 / a / (1d0 - e*e))
+    naome2 = SQRT(mu / a / (1d0 - e*e))
 
     x(1) = co * cwf - so * swf * ci
     x(2) = so * cwf + co * swf * ci

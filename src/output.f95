@@ -30,7 +30,7 @@ MODULE OUTPUT
       x = p%m1%x - p%m0%x
       v = p%m1%v - p%m0%v
 
-      CALL xv_to_oe(x,v,oe)
+      CALL xv_to_oe(p%m0%m, x,v,oe)
       CJ = Cjacobi(p)
 
 !      WRITE(outfile,"(7ES20.10)") t, x, v
