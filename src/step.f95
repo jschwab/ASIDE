@@ -4,12 +4,13 @@ MODULE step
   USE coord
   USE drift
   USE kick
+  USE check
 
   IMPLICIT NONE
 
   CONTAINS
 
-    SUBROUTINE bigstep(n, dt, p)
+    SUBROUTINE bigstep(n, dt, p, badstep)
 
       ! n - number of substeps to take
       ! dt - timestep
@@ -18,8 +19,12 @@ MODULE step
       INTEGER, INTENT(IN) :: n 
       REAL(rl), INTENT(IN) :: dt
       TYPE(allparticles), INTENT(INOUT) :: p
+      LOGICAL, INTENT(OUT) :: badstep
       
       INTEGER :: i
+      LOGICAL :: tooclose
+
+      badstep = .FALSE.
 
 !==================== DRIFT - KICK - DRIFT ====================
 
@@ -35,12 +40,20 @@ MODULE step
       !    CALL drift_kep(dt,p)
       !    CALL tohelio(p)
 
+      !    CALL check_close(p,tooclose)
+      !    if (tooclose) badstep = .TRUE.
+
+      !    if (badstep) return
+
       ! ENDDO
 
       ! ! final part of step KD^{1/2}
       ! CALL kick_all(dt, p)
       ! CALL drift_kep(0.5d0*dt, p)
       ! CALL tohelio(p)
+
+      ! CALL check_close(p,tooclose)
+      ! if (tooclose) badstep = .TRUE.
 
 !============================= END ===========================
 
@@ -57,17 +70,28 @@ MODULE step
 
          CALL drift_kep(dt,p)
          CALL tohelio(p)
+         CALL check_close(p,tooclose)
+
+         if (tooclose) badstep = .TRUE.
+         if (badstep) return
+
          CALL kick_all(dt, p)
 
       ENDDO
 
       ! final part of step KD^{1/2}
       CALL drift_kep(dt, p)
-
       CALL tohelio(p)
+      CALL check_close(p,tooclose)
+
+      if (tooclose) badstep = .TRUE.
+      if (badstep) return
+
       CALL kick_all(0.5_rl * dt, p)
 
 !============================= END ===========================
+
+      return
 
     END SUBROUTINE bigstep
 
