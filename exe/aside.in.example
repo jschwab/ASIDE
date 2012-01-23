@@ -1,0 +1,21 @@
+&TIMESTEP
+ dt = 1d-2,
+ tmax = 1d5,
+ tdump = 1d3/
+
+&PERTMASS
+ m = 1e-3,	
+ a = 1.0,
+ e = 0.75,
+ i = 0,
+ o = 0,
+ w = 0,
+ f = 180/
+
+&TESTMASS
+ a = 5.0,
+ e = 0,
+ i = 30,
+ o = 0,
+ w = 0,
+ f = 0/

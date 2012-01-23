@@ -17,8 +17,8 @@ class MyPlots
     @figure_maker = FigureMaker.default
     
     t.save_dir = 'plots_out'
-    @data_filename = "../exe/aside.out"
-    @swifter_filename = "/Users/jschwab/Classes/Fall_2011/AY250/integrators/swifter/bin/follow.out"
+    @data_filename = "example_data/aside.out.example"
+    @swifter_filename = "example_data/swifter.out.example"
 
     # configure data array
     @time = Dvector.new
@@ -60,12 +60,6 @@ class MyPlots
     @compare = TRUE
 
     # define figures
-    t.def_figure("semimajoraxis") { semimajoraxis } 
-    t.def_figure("eccentricity") { eccentricity } 
-    t.def_figure("inclination") { inclination } 
-    t.def_figure("ascendingnode") { ascendingnode } 
-    t.def_figure("argumentofpericenter") { argumentofpericenter } 
-
     t.def_figure("orbel") {orbel}
     t.def_enter_page_function { enter_page }
 
