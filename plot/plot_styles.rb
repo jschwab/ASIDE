@@ -20,13 +20,13 @@ module MyPlotStyles
   # Page size and margins
     # these default values are used by the default_enter_page_function
 
-    t.default_page_width = 72*5.5 # in big-points (1/72 inch)
-    t.default_page_height = 72*4.25 # in big-points (1/72 inch)
+    t.default_page_width = 72*6 # in big-points (1/72 inch)
+    t.default_page_height = 72*4 # in big-points (1/72 inch)
 
-    t.default_frame_left = 0.15 # as fraction of width from left edge
-    t.default_frame_right = 0.85 # as fraction of width from left edge
-    t.default_frame_top = 0.85 # as fraction of width from bottom edge
-    t.default_frame_bottom = 0.15 # as fraction of width from bottom edge
+    t.default_frame_left = 0.05 # as fraction of width from left edge
+    t.default_frame_right = 0.95 # as fraction of width from left edge
+    t.default_frame_top = 0.95 # as fraction of width from bottom edge
+    t.default_frame_bottom = 0.05 # as fraction of width from bottom edge
 
   # Graphics
     t.default_line_scale = 1

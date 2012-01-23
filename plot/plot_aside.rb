@@ -57,6 +57,8 @@ class MyPlots
     # props
     @margin = 0.05
 
+    @compare = TRUE
+
     # define figures
     t.def_figure("semimajoraxis") { semimajoraxis } 
     t.def_figure("eccentricity") { eccentricity } 
@@ -98,8 +100,19 @@ class MyPlots
   end
 
 
-
   def read_data
+
+    if not @read_once
+      read_aside
+      if @compare
+        read_swifter
+      end
+    @read_once = TRUE
+    end
+
+  end
+
+  def read_aside
     puts @data_filename
     Dvector.read(@data_filename, @data_array)
     @tmin = @time.min
@@ -110,99 +123,61 @@ class MyPlots
     Dvector.read(@swifter_filename, @swifter_array)
   end
 
+  def make_panel(ys, ylabel, ycompare = nil)
 
-  def semimajoraxis
     read_data
-    read_swifter
 
     xs = @time
-    ys = @a
-    
+    xlabel = "Time [s]"
+
+    t.set_aspect_ratio(0.666666)    
+
     t.show_plot(plot_boundaries(xs,ys,@margin)) {
-      t.show_xlabel("Time [s]")
-      t.show_ylabel('a')
+
+      t.show_xlabel(xlabel)
+      t.show_ylabel(ylabel)      
+
       t.show_polyline(xs,ys)
-      t.show_polyline(@swifter_time, @swifter_a, Red, nil, LINE_TYPE_DASH)
+      if @compare and ycompare != nil
+        t.show_polyline(@swifter_time, ycompare, Red, nil, LINE_TYPE_DASH)
+      end
     }
-    
+
+  end
+
+  def semimajoraxis
+    make_panel(@a,"a",@swifter_a)
   end
 
 
   def eccentricity
-    read_data
-    read_swifter
-
-    xs = @time
-    ys = @e
-    
-    t.show_plot(plot_boundaries(xs,ys,@margin)) {
-      t.show_xlabel("Time [s]")
-      t.show_ylabel('e')
-      t.show_polyline(xs,ys)
-      t.show_polyline(@swifter_time, @swifter_e, Red, nil, LINE_TYPE_DASH)
-    }
-
+    make_panel(@e,"e",@swifter_e)
   end
 
   def inclination
-    read_data
-
-    xs = @time
-    ys = @i * @RAD2DEG
-    
-    t.show_plot(plot_boundaries(xs,ys,@margin)) {
-      t.show_xlabel("Time [s]")
-      t.show_ylabel('i [deg]')
-      t.show_polyline(xs,ys)
-      t.show_polyline(@swifter_time, @swifter_i, Red, nil, LINE_TYPE_DASH)
-    }
-
+    ys = @i* @RAD2DEG
+    make_panel(ys,"$i$ [deg]",@swifter_i)
   end
 
   def ascendingnode
-    read_data
-
-    xs = @time
     ys = @o * @RAD2DEG
-    
-    t.show_plot(plot_boundaries(xs,ys,@margin)) {
-      t.show_xlabel("Time [s]")
-      t.show_ylabel('$\Omega$ [deg]')
-      t.show_polyline(xs,ys)
-      t.show_polyline(@swifter_time, @swifter_o, Red, nil, LINE_TYPE_DASH)
-    }
-
+    make_panel(ys,'$\Omega$ [deg]', @swifter_o)
   end
 
   def argumentofpericenter
-    read_data
-
-    xs = @time
     ys = @w * @RAD2DEG
-    
-    t.show_plot(plot_boundaries(xs,ys,@margin)) {
-      t.show_polyline(xs,ys)
-      t.show_polyline(@swifter_time, @swifter_w, Red, nil, LINE_TYPE_DASH)
-    }
-    
+    make_panel(ys,'$\omega$ [deg]', @swifter_w)
   end
 
   def jacobiconstant
-    read_data
-
-    xs = @time
     ys = 0.5 / @a + (@a * (1-@e*@e)).sqrt()
-    
-    t.show_plot(plot_boundaries(xs,ys,@margin)) {
-      t.show_polyline(xs,ys)
-    }
-    
+    make_panel(ys, "Jacobi Constant")
   end
 
 
   def orbel
 
-     t.rescale(0.5)
+    t.rescale(0.67)
     column_margin = 0.1
     t.subplot(t.column_margins(
         'num_columns' => 3, 'column' => 1,
@@ -237,15 +212,7 @@ class MyPlots
           'row_margin' => column_margin)) { jacobiconstant }
     }
 
-
-    # t.subplot(){ semimajoraxis }
-    # t.subplot(){ eccentricity }
-    # t.subplot(){ inclination }
-    # t.subplot(){ ascendingnode }
-    # t.subplot(){ argumentofpericenter }
   end
-
-
 
 end
 
