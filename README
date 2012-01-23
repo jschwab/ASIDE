@@ -1,14 +1,25 @@
 ASIDE: A Symplectic Integrator Demanded (by) Eugene
-Astro 250 Final Project: Fall 2011
 Josiah Schwab (jwschwab@berkeley.edu)
 
-This is a very naive implemenation of the Wisdom-Holman N-body map for
-the specific case of a massive central body, a small perturbing body
-and a test particle.
+This is a side project I played with during Planetary Dynamics (Fall '11).
+It's a rather naive implemenation of the Wisdom-Holman map for the 
+restricted three body problem. 
 
-This code is written in modern Fortran.
+/src/ 
+  The code, written in Fortran 95 (ish), lives here.
+  Typing 'make' will compile it with gfortran.
+
+/exe/
+  The executable file aside.x is placed here. 
+  At runtime, it reads aside.in. (see input.f95 for details)
+  The output goes into aside.out. (see output.f95 for details)
+
+/plot/
+  This contains plotting scripts in the Tioga language.
+  See most quanties with 'tioga plot_aside.rb -s orbel'.
 
 References
-Wisdom, J., & Holman, M. 1991, AJ, 102, 1528
-Saha, P., & Tremaine, S. 1994, AJ, 108, 1962 
-
+  Danby, J. M. A. 1988. Fundamentals of Celestial Mechanics
+  Wisdom, J., & Holman, M. 1991, AJ, 102, 1528
+  Saha, P., & Tremaine, S. 1994, AJ, 108, 1962 
+  Murray, C.D., & Dermott, S.F. 2000, Solar System Dynamics
