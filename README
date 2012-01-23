@@ -5,18 +5,26 @@ This is a side project I played with during Planetary Dynamics (Fall '11).
 It's a rather naive implemenation of the Wisdom-Holman map for the 
 restricted three body problem. 
 
-/src/ 
+src/ 
   The code, written in Fortran 95 (ish), lives here.
   Typing 'make' will compile it with gfortran.
 
-/exe/
+exe/
   The executable file aside.x is placed here. 
   At runtime, it reads aside.in. (see input.f95 for details)
   The output goes into aside.out. (see output.f95 for details)
+  There is an example input, aside.in.example.
 
-/plot/
+plot/
   This contains plotting scripts in the Tioga language.
   See most quanties with 'tioga plot_aside.rb -s orbel'.
+  
+  example_data/
+    The output of running ASIDE and SWIFTER on the initial conditinons
+    defined in aside.in.example. 
+
+  plots_out/
+    example.pdf is a comparison of the results of ASIDE and SWIFTER.
 
 References
   Danby, J. M. A. 1988. Fundamentals of Celestial Mechanics
